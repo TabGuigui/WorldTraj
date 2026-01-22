@@ -311,3 +311,111 @@ def _transform_pcs_to_images(
             & (cur_pc_cam[:, 1] > 0)
         )
     return cur_pc_cam, cur_pc_in_fov
+
+def _transform_trajs_to_images(
+    lidar_pc: npt.NDArray[np.float32],
+    sensor2lidar_rotation: npt.NDArray[np.float32],
+    sensor2lidar_translation: npt.NDArray[np.float32],
+    intrinsic: npt.NDArray[np.float32],
+    img_shape: Optional[Tuple[int, int]] = None,
+    eps: float = 1e-3,
+) -> Tuple[npt.NDArray[np.float32], npt.NDArray[np.bool_]]:
+    """
+    Transforms points in camera frame to image pixel coordinates
+    TODO: refactor
+    :param lidar_pc: lidar point cloud
+    :param sensor2lidar_rotation: camera rotation
+    :param sensor2lidar_translation: camera translation
+    :param intrinsic: camera intrinsics
+    :param img_shape: image shape in pixels, defaults to None
+    :param eps: threshold for lidar pc height, defaults to 1e-3
+    :return: lidar pc in pixel coordinates, mask of values in frame
+    """
+    pc_xyz = lidar_pc
+
+    lidar2cam_r = np.linalg.inv(sensor2lidar_rotation)
+    lidar2cam_t = sensor2lidar_translation @ lidar2cam_r.T
+    lidar2cam_rt = np.eye(4)
+    lidar2cam_rt[:3, :3] = lidar2cam_r.T
+    lidar2cam_rt[3, :3] = -lidar2cam_t
+
+    viewpad = np.eye(4)
+    viewpad[: intrinsic.shape[0], : intrinsic.shape[1]] = intrinsic
+    lidar2img_rt = viewpad @ lidar2cam_rt.T
+
+    cur_pc_xyz = np.concatenate([pc_xyz, np.ones_like(pc_xyz)[:, :1]], -1)
+    cur_pc_cam = lidar2img_rt @ cur_pc_xyz.T
+    cur_pc_cam = cur_pc_cam.T
+    cur_pc_in_fov = cur_pc_cam[:, 2] > eps
+    cur_pc_cam = cur_pc_cam[..., 0:2] / np.maximum(cur_pc_cam[..., 2:3], np.ones_like(cur_pc_cam[..., 2:3]) * eps)
+
+    if img_shape is not None:
+        img_h, img_w = img_shape
+        cur_pc_in_fov = (
+            cur_pc_in_fov
+            & (cur_pc_cam[:, 0] < (img_w - 1))
+            & (cur_pc_cam[:, 0] > 0)
+            & (cur_pc_cam[:, 1] < (img_h - 1))
+            & (cur_pc_cam[:, 1] > 0)
+        )
+    return cur_pc_cam, cur_pc_in_fov
+
+def add_trajectory_to_camera_ax(ax: plt.Axes, camera: Camera, annotations, gt_trajectory, trajectory) -> plt.Axes:
+    """
+    Adds camera image with bounding boxes on matplotlib ax object
+    :param ax: matplotlib ax object
+    :param camera: navsim camera dataclass
+    :param annotations: navsim annotations dataclass
+    :return: ax object with image
+    """
+
+    image = camera.image.copy()
+    image_height, image_width = image.shape[:2]
+
+    
+    i = 0
+    for traj in [gt_trajectory, trajectory[0], trajectory[1]]:
+        
+        poses = traj.poses[:8, :2]
+        poses = np.concatenate((poses, np.ones_like(poses)[:, :1]*0.2), axis=1)
+
+        pc_in_cam, pc_in_fov_mask = _transform_trajs_to_images(
+            poses,
+            camera.sensor2lidar_rotation,
+            camera.sensor2lidar_translation,
+            camera.intrinsics,
+            img_shape=(image_height, image_width),
+        )
+
+        x = pc_in_cam[:, 0]
+        y = pc_in_cam[:, 1]
+        if i== 0:
+            ax.plot(x, y, 
+                color="blue",
+                linestyle='-',
+                linewidth=3,
+                marker='x',
+                markersize=6,
+                label="Expert")
+        elif i == 1:
+            ax.plot(x, y, 
+                color="red",
+                linestyle='-',
+                linewidth=3,
+                marker='o',
+                markersize=6,
+                label="WorldTraj")
+        else:
+            ax.plot(x, y, 
+                color="green",     # 线条颜色
+                linestyle='-',   # 实线
+                linewidth=3,     # 线宽
+                marker='o',      # 点标记
+                markersize=6,
+                label="WorldTraj_w_Refine")    # 标记大小
+        i += 1
+
+        ax.legend(loc="upper right", fontsize=15)
+        ax.imshow(image)
+
+    return ax

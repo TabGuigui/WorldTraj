@@ -24,11 +24,21 @@ class AgentLightningModule(pl.LightningModule):
         :param logging_prefix: prefix where to log step
         :return: scalar loss
         """
-        features, targets = batch
-        prediction = self.agent.forward(features)
-        loss = self.agent.compute_loss(features, targets, prediction)
-        self.log(f"{logging_prefix}/loss", loss, on_step=True, on_epoch=True, prog_bar=True, sync_dist=True)
-        return loss
+        features, targets, tokens_list = batch
+        prediction = self.agent.forward(features, targets, tokens_list)
+        # loss = self.agent.compute_loss(features, targets, prediction)
+        # self.log(f"{logging_prefix}/loss", loss, on_step=True, on_epoch=True, prog_bar=True, sync_dist=True)
+        # return loss
+        loss_dict = self.agent.compute_loss(features, targets, prediction)
+        for k, v in loss_dict.items():
+            if v is not None:
+                self.log(f"{logging_prefix}/{k}", v, on_step=True, on_epoch=True, prog_bar=True, sync_dist=True, batch_size=len(batch[0]))
+        current_lr = self.trainer.optimizers[0].param_groups[0]['lr']
+        self.log(f"learning_rate", current_lr, on_step=True, logger=True, sync_dist=True, batch_size=len(batch[0]))
+        if logging_prefix == "train":
+            return loss_dict['loss']
+        else:
+            return loss_dict
 
     def training_step(self, batch: Tuple[Dict[str, Tensor], Dict[str, Tensor]], batch_idx: int) -> Tensor:
         """

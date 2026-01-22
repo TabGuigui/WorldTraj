@@ -302,3 +302,62 @@ def add_linestring_to_bev_ax(ax: plt.Axes, linestring: LineString, config: Dict[
     )
 
     return ax
+
+def add_multimodal_trajectory_to_bev_ax(ax: plt.Axes, trajectory_list, config: Dict[str, Any], gt_pose) -> plt.Axes:
+    """
+    Add trajectory poses as lint to plot
+    :param ax: matplotlib ax object
+    :param trajectory: navsim trajectory dataclass
+    :param config: dictionary with plot parameters
+    :return: ax with plot
+    """
+    poses = np.concatenate([np.array([[0, 0]]), gt_pose.poses[:8, :2]])
+
+    ax.plot(
+        poses[:, 1],
+        poses[:, 0],
+        color="blue",
+        alpha=1,
+        linewidth=config["line_width"],
+        linestyle=config["line_style"],
+        marker=config["marker"],
+        markersize=config["marker_size"],
+        markeredgecolor=config["marker_edge_color"],
+        zorder=config["zorder"],
+        label=f"Expert")
+    
+    top_n = len(trajectory_list)
+    for i in range(0, top_n):
+        poses = np.concatenate([np.array([[0, 0]]), trajectory_list[i].poses[:, :2]])
+        if i == 0:
+            ax.plot(
+                poses[:, 1],
+                poses[:, 0],
+                color="red",
+                alpha=1,
+                linewidth=config["line_width"],
+                linestyle=config["line_style"],
+                marker=config["marker"],
+                markersize=config["marker_size"],
+                markeredgecolor=config["marker_edge_color"],
+                zorder=config["zorder"],
+                label=f"WorldTraj"
+            )
+        if i == 3:
+            ax.plot(
+                poses[:, 1],
+                poses[:, 0],
+                color="green",
+                alpha=1,
+                linewidth=config["line_width"],
+                linestyle=config["line_style"],
+                marker=config["marker"],
+                markersize=config["marker_size"],
+                markeredgecolor=config["marker_edge_color"],
+                zorder=config["zorder"],
+                label=f"WorldTraj_w_Refine"
+            )
+        
+
+    ax.legend(loc='upper right', fontsize=15)
+    return ax

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 from pathlib import Path
+import re
 
 from tqdm import tqdm
 import pickle
@@ -88,6 +89,15 @@ class SceneLoader:
         self._sensor_blobs_path = sensor_blobs_path
         self._scene_filter = scene_filter
         self._sensor_config = sensor_config
+
+        self.token_to_log_file: Dict[str, str] = {}
+        self._build_token_to_log_file()  # 构建 token_to_log_file 字典
+
+    def _build_token_to_log_file(self):
+        """Builds the token_to_log_file dictionary."""
+        for token, scene_dict_list in self.scene_frames_dicts.items():
+            log_name = scene_dict_list[0]["log_name"]
+            self.token_to_log_file[token] = log_name
 
     @property
     def tokens(self) -> List[str]:
@@ -178,6 +188,9 @@ class MetricCacheLoader:
         with open(str(metadata_file), "r") as f:
             cache_paths = f.read().splitlines()[1:]
         metric_cache_dict = {cache_path.split("/")[-2]: cache_path for cache_path in cache_paths}
+        # metric_cache_root_in_csv = re.findall(r'(.*?/metric_cache)/', list(metric_cache_dict.values())[0])[0]
+        # for key, value in metric_cache_dict.items():
+        #     metric_cache_dict[key] = value.replace(metric_cache_root_in_csv, str(cache_path))
         return metric_cache_dict
 
     @property

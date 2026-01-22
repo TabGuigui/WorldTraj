@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from navsim.agents.abstract_agent import AbstractAgent
 from navsim.common.dataclasses import Scene
 from navsim.visualization.config import BEV_PLOT_CONFIG, TRAJECTORY_CONFIG, CAMERAS_PLOT_CONFIG
-from navsim.visualization.bev import add_configured_bev_on_ax, add_trajectory_to_bev_ax
-from navsim.visualization.camera import add_annotations_to_camera_ax, add_lidar_to_camera_ax, add_camera_ax
+from navsim.visualization.bev import add_configured_bev_on_ax, add_trajectory_to_bev_ax, add_multimodal_trajectory_to_bev_ax
+from navsim.visualization.camera import add_annotations_to_camera_ax, add_lidar_to_camera_ax, add_camera_ax, add_trajectory_to_camera_ax
 
 
 def configure_bev_ax(ax: plt.Axes) -> plt.Axes:
@@ -42,6 +42,16 @@ def configure_ax(ax: plt.Axes) -> plt.Axes:
     ax.set_yticks([])
     return ax
 
+def configure_all_single_ax(ax: List[List[plt.Axes]]) -> List[List[plt.Axes]]:
+    """
+    Iterates through 2D ax list/array to apply configurations
+    :param ax: 2D list/array of matplotlib ax object
+    :return: configure axes
+    """
+    for j in range(len(ax)):
+        configure_ax(ax[j])
+
+    return ax
 
 def configure_all_ax(ax: List[List[plt.Axes]]) -> List[List[plt.Axes]]:
     """
@@ -123,6 +133,39 @@ def plot_cameras_frame(scene: Scene, frame_idx: int) -> Tuple[plt.Figure, Any]:
 
     return fig, ax
 
+def plot_cameras_frame(scene: Scene, agent, frame_idx: int, train_data, token) -> Tuple[plt.Figure, Any]:
+    """
+    Plots 8x cameras and birds-eye-view visualization in 3x3 grid
+    :param scene: navsim scene dataclass
+    :param frame_idx: index of selected frame
+    :return: figure and ax object of matplotlib
+    """
+
+    frame = scene.frames[frame_idx]
+    w = 6
+    h = 12
+    c = w
+    
+    fig, ax = plt.subplots(1, 2, figsize=(h + c, 6))
+
+    plt.subplots_adjust(wspace=0)
+
+    ax[0].set_position([0, 0, (h) / (c+h), 1])
+    ax[1].set_position([(h-0.5) / (c+h), 0, (c) / (c+h), 1])
+
+    features, targets = train_data._load_scene_with_token(token)
+    features = {k: v.to("cuda")  for k, v in features.items()}
+    targets = {k: v.to("cuda")  for k, v in targets.items()}
+
+    agent_trajectory_list = agent.compute_trajectory(features, targets, [token])
+    gt_trajectory = scene.get_future_trajectory() # GT
+
+    add_trajectory_to_camera_ax(ax[0], frame.cameras.cam_f0, frame.annotations, gt_trajectory, [agent_trajectory_list[0], agent_trajectory_list[-1]])
+    add_configured_bev_on_ax(ax[1], scene.map_api, frame)
+    add_multimodal_trajectory_to_bev_ax(ax[1], agent_trajectory_list, TRAJECTORY_CONFIG["agent"], gt_trajectory)
+    configure_all_single_ax(ax)
+    configure_bev_ax(ax[1])
+    return fig, ax
 
 def plot_cameras_frame_with_lidar(scene: Scene, frame_idx: int) -> Tuple[plt.Figure, Any]:
     """
