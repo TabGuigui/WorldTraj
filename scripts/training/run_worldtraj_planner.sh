@@ -20,14 +20,14 @@ echo "GPUS: ${GPUS}"
 export CUDA_LAUNCH_BLOCKING=1
 
 
-python3  $NAVSIM_DEVKIT_ROOT/navsim/planning/script/run_training_worlddrive.py \
-    agent=worlddrive_agent \
-    agent.lr=5e-4 \
-    agent.checkpoint_path="/data/diffusiondrive/ckpt/worldtraj/train-nuplan-trajworld-cogvideo_pt_cf4pf9_512x1024_navsim_2node_woteanchor/tvar_200000.pkl" \
+python3  $NAVSIM_DEVKIT_ROOT/navsim/planning/script/run_training_worldtraj.py \
+    agent=worldtraj_agent \
+    agent.lr=3e-4 \
+    agent.checkpoint_path="/data/worlddrive/navsim/exp/ckpt/cogvideox_tadwm_navsim_20wpt/tvar_10000.pkl" \
     agent.with_wm_proj=True \
     experiment_name=training_worlddrive \
     trainer.params.max_epochs=50  \
-    dataloader.params.batch_size=64 \
+    dataloader.params.batch_size=32 \
     dataloader.params.num_workers=10 \
     train_test_split=navtrain \
     split=trainval \
