@@ -38,6 +38,7 @@ Xingtai Gui<sup>1</sup>, Meijie Zhang<sup>2</sup>, Tianyi Yan<sup>1</sup>, Wench
 - [Abstract](#abstract)
 - [Overview](#overview)
 - [Getting Started](#getting-started)
+- [Training and Evaluation](#training-and-evaluation)
 - [Contact](#contact)
 - [Acknowledgement](#acknowledgement)
 - [Citation](#citation)
@@ -55,6 +56,8 @@ End-to-end autonomous driving aims to generate safe and plausible planning polic
 
 
 ## Getting Started
+
+---
 
 We provide detailed guides to help you quickly set up, and evaluate WorldTraj:
 
@@ -109,7 +112,7 @@ sh scripts/cache/run_caching_trajworld_eval.sh # navtest for eval
 ```
 
 #### Step2: download ta-dwm checkpoint
-You can download the corresponding ta-dwm checkpoint training on NAVSIM (*worldtraj_stage1_1024_tadwm*) or use the checkpoint from Stage 1. \
+You can download the corresponding ta-dwm checkpoint training on NAVSIM (*worldtraj_stage1_1024_tadwm*) or use the checkpoint training from Stage 1. \
 👉 [TA-DWM Model](https://huggingface.co/tabguigui/WorldTraj/tree/main)
 
 #### Step3: train planner
@@ -130,7 +133,15 @@ sh scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage1.sh
 
 ## Stage 3: World Model Alignment and Refinement
 
+#### Step1: evaluate worldtraj
+go to `scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage2.sh` configure the evaluation script.
 
+Launch the multi-gpu evaluation process:
+```bash
+sh scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage2.sh
+```
+
+#### Step2: visulize worldtraj
 
 ## Contact
 If you have any questions, please contact Xingtai via email (tabgui324@gmail.com)
