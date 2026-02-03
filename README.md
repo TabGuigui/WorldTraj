@@ -37,7 +37,8 @@ Xingtai Gui<sup>1</sup>, Meijie Zhang<sup>2</sup>, Tianyi Yan<sup>1</sup>, Wench
 - [Abstract](#abstract)
 - [Overview](#overview)
 - [Getting Started](#getting-started)
-- [Training and Evaluation](#training-and-evaluation)
+- [Checkpoint](#checkpoint)
+- [Quick Training and Evaluation](#quick-training-and-evaluation)
 - [Contact](#contact)
 - [Acknowledgement](#acknowledgement)
 - [Citation](#citation)
@@ -57,75 +58,39 @@ End-to-end autonomous driving aims to generate safe and plausible planning polic
 
 ## Getting Started
 
-
 We provide detailed guides to help you quickly set up, and evaluate WorldTraj:
 
 - [Getting started from NAVSIM environment preparation](https://github.com/autonomousvision/navsim?tab=readme-ov-file#getting-started-)
 - [Preparation of WorldTraj environment](docs/Installation.md)
 - [WorldTraj Training and Evaluation](docs/Train_Eval.md)
 
-## Training and Evaluation
-
-### Stage 1: Trajectory-aware Driving World Model pretrain *(Optional)*
-
-> ⚠️ This stage is optional since a long time training.  
-> You may skip it and directly use our released TA-DWM checkpoint.
-
-#### Step 1: Download pretrained WM checkpoint
-
-First you need to download the pretrained wm checkpoint training on nuPlan(*cogvideox_2B_tadwm_stage1_pretrain*) \
-👉 [Model](https://huggingface.co/tabguigui/WorldTraj/tree/main)
+## Checkpoint
 
 
-#### Step 2: Configure training script
-After downloading, go to `/data/worlddrive/navsim/scripts/training_wm/tadwm_stage2.sh` configure the training script.
+## Quick Training and Evaluation
 
-Launch the training process:
-```bash
-cd /data/worlddrive/navsim/scripts/training_wm/
-sh .tadwm_training.sh
-```
-
-
-### Stage 2: Multi-modal Planner Training
-
-Stage 2 consists of three steps:
-
-1. Cache dataset
-2. Download TA-DWM checkpoint
-3. Train planner
+### Multi-modal Planner Training
 
 #### Step1: cache dataset(3D causal VAE latents)
 You need to download the pretrained 3D Causal VAE from offical CogvideoX-2B HF\
 👉 [CogvideoX-2B VAE](https://huggingface.co/zai-org/CogVideoX-2b/tree/main)
-
 You need to download the anchor and corresponding formated PDMS\
 👉 [Anchors](https://huggingface.co/tabguigui/WorldTraj/tree/main)
-
-go to `scripts/cache/run_caching_trajworld.sh` configure the training script.
-
-Launch the multi-gpu data cache process(takes about 4hs with 8 GPUs):
 ```bash
 sh scripts/cache/run_caching_trajworld.sh # navtrain
 sh scripts/cache/run_caching_trajworld_eval.sh # navtest for eval
 ```
 
 #### Step2: download ta-dwm checkpoint
-You can download the corresponding ta-dwm checkpoint training on NAVSIM (*worldtraj_stage1_1024_tadwm*) or use the checkpoint training from Stage 1. \
+You can download the corresponding ta-dwm checkpoint training on NAVSIM (*worldtraj_stage1_1024_tadwm*) or use the checkpoint training from [ta-dwm training](docs/Train_Eval.md). \
 👉 [TA-DWM Model](https://huggingface.co/tabguigui/WorldTraj/tree/main)
 
 #### Step3: train planner
-go to `scripts/cache/run_caching_trajworld.sh` configure the training script.
-
-Launch the multi-gpu training process:
 ```bash
 sh scripts/training/run_worldtraj_planner.sh
 ```
 
 #### Step4: evaluate planner
-go to `scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage1.sh` configure the evaluation script.
-
-Launch the multi-gpu evaluation process:
 ```bash
 sh scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage1.sh
 ```
@@ -133,8 +98,6 @@ sh scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage1.sh
 ## Stage 3: World Model Alignment and Refinement
 
 #### Step1: evaluate worldtraj
-go to `scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage2.sh` configure the evaluation script.
-
 Launch the multi-gpu evaluation process:
 ```bash
 sh scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage2.sh
