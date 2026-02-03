@@ -54,10 +54,10 @@ End-to-end autonomous driving aims to generate safe and plausible planning polic
 <img src="assets/main_fig.png" width = "888"  align=center />
 </div>
 
+---
 
 ## Getting Started
 
----
 
 We provide detailed guides to help you quickly set up, and evaluate WorldTraj:
 
@@ -142,6 +142,9 @@ sh scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage2.sh
 ```
 
 #### Step2: visulize worldtraj
+
+
+---
 
 ## Contact
 If you have any questions, please contact Xingtai via email (tabgui324@gmail.com)
