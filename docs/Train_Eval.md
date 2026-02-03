@@ -9,7 +9,7 @@
 
 ### Step 1: Download pretrained WM checkpoint
 
-First you need to download the pretrained wm checkpoint training on nuPlan(CogvideoX-2B.pkl) \
+First you need to download the pretrained wm checkpoint training on nuPlan(*cogvideox_2B_tadwm_stage1_pretrain*) \
 👉 [Model](https://huggingface.co/tabguigui/WorldTraj/tree/main)
 
 
@@ -36,18 +36,18 @@ You need to download the pretrained 3D Causal VAE from offical CogvideoX-2B HF\
 👉 [CogvideoX-2B VAE](https://huggingface.co/zai-org/CogVideoX-2b/tree/main)
 
 You need to download the anchor and corresponding formated PDMS \
-
 👉 [Anchors](https://huggingface.co/tabguigui/WorldTraj/tree/main)
 
 go to `scripts/cache/run_caching_trajworld.sh` configure the training script.
 
 Launch the multi-gpu data cache process:
 ```bash
-sh scripts/cache/run_caching_trajworld.sh
+sh scripts/cache/run_caching_trajworld.sh # navtrain
+sh scripts/cache/run_caching_trajworld_eval.sh # navtest for eval
 ```
 
 ### Step2: download ta-dwm checkpoint
-You can download the corresponding ta-dwm checkpoint training on NAVSIM (worldtraj_stage1_1024_tadwm.pkl) or use the checkpoint from Stage 1. \
+You can download the corresponding ta-dwm checkpoint training on NAVSIM (*worldtraj_stage1_1024_tadwm*) or use the checkpoint from Stage 1. \
 👉 [TA-DWM Model](https://huggingface.co/tabguigui/WorldTraj/tree/main)
 
 
@@ -75,4 +75,10 @@ Only the following module should be newly initialized:
 ```text
 trajplanner
 ```
+#### Step4: evaluate planner
+go to `scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage1.sh` configure the evaluation script.
 
+Launch the multi-gpu evaluation process:
+```bash
+sh scripts/evaluation/run_worlddrive_planner_pdm_score_evaluation_stage1.sh
+```

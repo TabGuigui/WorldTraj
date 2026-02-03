@@ -16,4 +16,4 @@ Download the pretrained world model checkpoint [Model](https://huggingface.co/ta
 
 python3 setup.py develop
 
-And see [WorldTraj Training and Evaluation](docs/Train_Eval.md)
+And see [WorldTraj Training and Evaluation](Train_Eval.md)
