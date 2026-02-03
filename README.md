@@ -1,8 +1,7 @@
 <div align="center">
 
-<h1>WorldTraj</h1>
+<h1>WorldTraj: Driving with World Model via Unifying Visual and Trajectory Representation</h1>
 
-<h3 align="center">Driving with World Model via Unifying Visual and Trajectory Representation</h3>
 
 Xingtai Gui<sup>1</sup>, Meijie Zhang<sup>2</sup>, Tianyi Yan<sup>1</sup>, Wencheng Han<sup>1</sup>, Jiahao Gong<sup>3</sup>, Feiyang Tan<sup>3</sup>, Cheng-zhong Xu<sup>1</sup>, Jianbing Shen<sup>1</sup>  <br>
 > 
