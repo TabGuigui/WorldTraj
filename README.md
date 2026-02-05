@@ -7,7 +7,7 @@ Xingtai Gui<sup>1</sup>, Meijie Zhang<sup>2</sup>, Tianyi Yan<sup>1</sup>, Wench
 > 
 <sup>1</sup>SKL-IOTSC, CIS, University of Macau, <sup>2</sup>MEGVII Technology, <sup>3</sup>Mach Drive
 
-<a href="https://arxiv.org/pdf/2512.00723"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b.svg" alt="arXiv">
+<!-- <a href="https://arxiv.org/pdf/2512.00723"><img src="https://img.shields.io/badge/arXiv-Paper-b31b1b.svg" alt="arXiv"> -->
 </a>
 <a href="https://huggingface.co/tabguigui/WorldTraj">
     <img src="https://img.shields.io/badge/Model-HuggingFace-orange?logo=huggingface" alt="hf">
